@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\Bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;SERVER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -162,7 +162,7 @@
     <Compile Include="Component\LocationComponent.cs" />
     <Compile Include="Component\ActorComponent.cs" />
     <Compile Include="Component\UnitComponent.cs" />
-    <Compile Include="Component\Unit\SessionInfoComponent.cs" />
+    <Compile Include="Component\Player\SessionInfoComponent.cs" />
     <Compile Include="Component\Unit\MasterComponent.cs" />
     <Compile Include="Component\Unit\LockComponent.cs" />
     <Compile Include="Component\AppManagerComponent.cs" />

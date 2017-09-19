@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Model
@@ -11,7 +10,7 @@ namespace Model
 	}
 
 	[ObjectEvent]
-	public class ActorComponentEvent : ObjectEvent<ActorComponent>, IAwake, IAwake<IEntityActorHandler>, IStart
+	public class ActorComponentEvent : ObjectEvent<ActorComponent>, IAwake, IAwake<IEntityActorHandler>
 	{
 		public void Awake()
 		{
@@ -21,11 +20,6 @@ namespace Model
 		public void Awake(IEntityActorHandler iEntityActorHandler)
 		{
 			this.Get().Awake(iEntityActorHandler);
-		}
-
-		public void Start()
-		{
-			this.Get().Start();
 		}
 	}
 
@@ -39,26 +33,36 @@ namespace Model
 		private long actorId;
 
 		// 队列处理消息
-		private readonly Queue<ActorMessageInfo> queue = new Queue<ActorMessageInfo>();
+		private readonly EQueue<ActorMessageInfo> queue = new EQueue<ActorMessageInfo>();
 
 		private TaskCompletionSource<ActorMessageInfo> tcs;
 
 		public void Awake()
 		{
 			this.entityActorHandler = new CommonEntityActorHandler();
+
+			this.actorId = this.Entity.Id;
+			Game.Scene.GetComponent<ActorManagerComponent>().Add(this.Entity);
+			this.HandleAsync();
 		}
 
 		public void Awake(IEntityActorHandler iEntityActorHandler)
 		{
 			this.entityActorHandler = iEntityActorHandler;
-		}
-		
-		public async void Start()
-		{
+
 			this.actorId = this.Entity.Id;
 			Game.Scene.GetComponent<ActorManagerComponent>().Add(this.Entity);
-			await Game.Scene.GetComponent<LocationProxyComponent>().Add(this.actorId);
 			this.HandleAsync();
+		}
+
+		public async Task AddLocation()
+		{
+			await Game.Scene.GetComponent<LocationProxyComponent>().Add(this.actorId);
+		}
+
+		public async Task RemoveLocation()
+		{
+			await Game.Scene.GetComponent<LocationProxyComponent>().Remove(this.actorId);
 		}
 
 		public void Add(ActorMessageInfo info)
@@ -102,7 +106,7 @@ namespace Model
 			}
 		}
 
-		public override async void Dispose()
+		public override void Dispose()
 		{
 			try
 			{
@@ -114,8 +118,6 @@ namespace Model
 				base.Dispose();
 
 				Game.Scene.GetComponent<ActorManagerComponent>().Remove(actorId);
-
-				await Game.Scene.GetComponent<LocationProxyComponent>().Remove(this.actorId);
 			}
 			catch (Exception)
 			{
